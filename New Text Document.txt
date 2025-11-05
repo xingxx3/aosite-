@@ -1,2 +1,35 @@
 docker compose build web
 docker compose up -d web
+
+
+
+Changes Made:
+Improved error handling (server.js):
+More specific error messages indicating which environment variables are missing
+Detailed logging for debugging
+Error response includes details about missing variables
+Added startup checks (server.js):
+Logs warnings at server startup if environment variables are missing
+Provides instructions on where to configure them in Coolify
+Updated README:
+Added Coolify deployment instructions
+Added troubleshooting section for Coolify-specific issues
+How to Fix the Issue:
+In Coolify, set these environment variables:
+Go to your application settings in Coolify
+Navigate to Environment Variables
+Add:
+TELEGRAM_BOT_TOKEN = your Telegram bot token
+ADMIN_CHAT_ID = your Telegram chat ID
+PORT = 3000 (optional, defaults to 3000)
+After adding the variables, restart/redeploy your application
+Check the application logs in Coolify — you should see:
+✓ TELEGRAM_BOT_TOKEN is set
+✓ ADMIN_CHAT_ID is set
+If variables are missing, you'll see warnings in the logs.
+Next Steps:
+Commit and push these changes to your repository
+Set the environment variables in Coolify
+Redeploy/restart the application
+Try registering again — it should work now
+The error message will now be more descriptive if variables are still missing, making it easier to diagnose.

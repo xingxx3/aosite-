@@ -70,8 +70,20 @@ app.post('/register', async (req, res) => {
     const chatId = process.env.ADMIN_CHAT_ID;
     
     if (!botToken || !chatId) {
-      console.error('Missing Telegram credentials in .env file');
-      return res.status(500).json({ error: 'Server configuration error' });
+      const missingVars = [];
+      if (!botToken) missingVars.push('TELEGRAM_BOT_TOKEN');
+      if (!chatId) missingVars.push('ADMIN_CHAT_ID');
+      
+      console.error('=== MISSING ENVIRONMENT VARIABLES ===');
+      console.error('Missing variables:', missingVars.join(', '));
+      console.error('TELEGRAM_BOT_TOKEN:', botToken ? 'SET' : 'MISSING');
+      console.error('ADMIN_CHAT_ID:', chatId ? 'SET' : 'MISSING');
+      console.error('All environment variables:', Object.keys(process.env).filter(k => k.includes('TELEGRAM') || k.includes('ADMIN') || k.includes('CHAT')));
+      
+      return res.status(500).json({ 
+        error: 'Server configuration error',
+        details: `Missing required environment variables: ${missingVars.join(', ')}. Please configure these in your Coolify deployment settings.`
+      });
     }
     
     const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
@@ -100,6 +112,29 @@ app.post('/register', async (req, res) => {
 app.get('/success.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'AO SUCCESS.html'));
 });
+
+// Check environment variables on startup
+const botToken = process.env.TELEGRAM_BOT_TOKEN;
+const chatId = process.env.ADMIN_CHAT_ID;
+
+console.log('=== SERVER STARTUP CHECK ===');
+if (!botToken) {
+  console.error('⚠️  WARNING: TELEGRAM_BOT_TOKEN environment variable is not set!');
+} else {
+  console.log('✓ TELEGRAM_BOT_TOKEN is set');
+}
+
+if (!chatId) {
+  console.error('⚠️  WARNING: ADMIN_CHAT_ID environment variable is not set!');
+} else {
+  console.log('✓ ADMIN_CHAT_ID is set');
+}
+
+if (!botToken || !chatId) {
+  console.error('⚠️  Registration will fail until these environment variables are configured.');
+  console.error('   In Coolify: Go to your application settings > Environment Variables');
+  console.error('   Add: TELEGRAM_BOT_TOKEN and ADMIN_CHAT_ID');
+}
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

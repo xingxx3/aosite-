@@ -15,7 +15,34 @@ This application provides a registration form that sends registration data to a 
 
 ## Setup
 
-### Option 1: Using Docker Compose (Recommended)
+### Option 1: Deploying to Coolify
+
+1. **Configure Environment Variables in Coolify:**
+   - Go to your application settings in Coolify
+   - Navigate to **Environment Variables** section
+   - Add the following required variables:
+     ```
+     TELEGRAM_BOT_TOKEN=your_bot_token_here
+     ADMIN_CHAT_ID=your_chat_id_here
+     PORT=3000
+     ```
+   - **IMPORTANT:** These environment variables MUST be set in Coolify, otherwise registration will fail with "Server configuration error"
+
+2. **Deploy the application:**
+   - Push your code to your Git repository
+   - Coolify will automatically build and deploy using the Dockerfile
+   - Check the application logs to verify environment variables are set correctly
+
+3. **Verify Deployment:**
+   - Check the server logs in Coolify - you should see startup messages indicating whether environment variables are configured
+   - If variables are missing, you'll see warnings in the logs
+
+**Troubleshooting Coolify Deployment:**
+- If you see "Server configuration error" when users try to register, check that `TELEGRAM_BOT_TOKEN` and `ADMIN_CHAT_ID` are set in Coolify's environment variables
+- The server logs will show which variables are missing
+- Make sure to restart/redeploy the application after adding environment variables
+
+### Option 2: Using Docker Compose (Recommended for Local)
 
 1. Make sure you have a `.env` file in the project root with the following variables:
    ```
@@ -36,7 +63,7 @@ This application provides a registration form that sends registration data to a 
 
 3. Access the application at `http://localhost:3000`
 
-### Option 2: Using Docker directly
+### Option 3: Using Docker directly
 
 1. Make sure you have a `.env` file in the project root with the following variables:
    ```
