@@ -920,6 +920,7 @@
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
       max-height: 300px;
       overflow-y: auto;
+      overflow-x: hidden;
       z-index: 10000;
       min-width: 200px;
       display: none;
@@ -955,6 +956,7 @@
     .country-code-options-container {
       max-height: 250px;
       overflow-y: auto;
+      overflow-x: hidden;
     }
     
     .country-code-option {
@@ -2447,6 +2449,72 @@
       filterOptions('');
     }
     
+    // Function to constrain dropdown height to prevent footer overlap
+    function constrainDropdownHeight() {
+      const buttonRect = button.getBoundingClientRect();
+      const buttonBottom = buttonRect.bottom;
+      
+      // Find the footer - check multiple selectors and computed styles
+      const footerSelectors = [
+        'footer',
+        '[class*="footer"]',
+        'body > div:last-child'
+      ];
+      
+      let minFooterTop = window.innerHeight;
+      
+      footerSelectors.forEach(selector => {
+        try {
+          const elements = document.querySelectorAll(selector);
+          elements.forEach(el => {
+            const rect = el.getBoundingClientRect();
+            // Only consider elements that are below the button and visible
+            if (rect.top > buttonBottom && rect.top < minFooterTop && rect.height > 0) {
+              // Check if it looks like a footer (has blue background or is at bottom)
+              const style = window.getComputedStyle(el);
+              const bgColor = style.backgroundColor;
+              const isNearBottom = rect.bottom >= window.innerHeight - 50;
+              
+              // Check for blue-ish backgrounds (rgb values)
+              const isBlueBackground = bgColor.includes('rgb') && (
+                bgColor.includes('0, 0') || // Dark blue/black
+                bgColor.includes('13, 110') || // Blue shades
+                bgColor.includes('29, 78') || // Blue shades
+                bgColor.includes('37, 99') // Blue shades
+              );
+              
+              if (isNearBottom || isBlueBackground || selector === 'body > div:last-child') {
+                minFooterTop = Math.min(minFooterTop, rect.top);
+              }
+            }
+          });
+        } catch(e) {}
+      });
+      
+      // Also check all divs at the bottom of the page
+      const allDivs = document.querySelectorAll('body > div');
+      if (allDivs.length > 0) {
+        const lastDiv = allDivs[allDivs.length - 1];
+        const rect = lastDiv.getBoundingClientRect();
+        if (rect.top > buttonBottom && rect.top < minFooterTop) {
+          minFooterTop = rect.top;
+        }
+      }
+      
+      // Calculate available space (with padding)
+      const availableSpace = minFooterTop - buttonBottom - 30;
+      
+      // Set max height (minimum 150px, maximum 300px)
+      const maxHeight = Math.max(150, Math.min(300, availableSpace));
+      
+      // Apply to dropdown
+      dropdown.style.setProperty('max-height', maxHeight + 'px', 'important');
+      
+      // Apply to options container (account for search box ~60px)
+      const optionsMaxHeight = Math.max(100, maxHeight - 60);
+      optionsContainer.style.setProperty('max-height', optionsMaxHeight + 'px', 'important');
+    }
+    
     // Toggle dropdown
     button.addEventListener('click', (e) => {
       e.preventDefault();
@@ -2456,10 +2524,16 @@
       if (isOpen) {
         closeCountryCodeDropdown();
       } else {
+        // Constrain height before opening
+        constrainDropdownHeight();
         dropdown.classList.add('open');
         button.classList.add('open');
         button.setAttribute('aria-expanded', 'true');
-        setTimeout(() => searchInput.focus(), 100);
+        // Re-constrain after a brief delay to ensure layout is complete
+        setTimeout(() => {
+          constrainDropdownHeight();
+          searchInput.focus();
+        }, 50);
       }
     });
     
@@ -2475,6 +2549,84 @@
     if (!window.countryCodeEscapeHandlerAdded) {
       document.addEventListener('keydown', handleCountryCodeEscapeKey);
       window.countryCodeEscapeHandlerAdded = true;
+    }
+    
+    // Add resize/scroll handler to recalculate dropdown height when open
+    if (!window.countryCodeResizeHandlerAdded) {
+      let resizeTimeout;
+      function recalculateOpenDropdowns() {
+        const openDropdowns = document.querySelectorAll('.country-code-dropdown.open');
+        if (openDropdowns.length === 0) return;
+        
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+          openDropdowns.forEach(openDropdown => {
+            const selector = openDropdown.closest('.country-code-selector');
+            const btn = selector?.querySelector('.country-code-button');
+            if (!btn) return;
+            
+            const buttonRect = btn.getBoundingClientRect();
+            const buttonBottom = buttonRect.bottom;
+            
+            const footerSelectors = [
+              'footer',
+              '[class*="footer"]',
+              'body > div:last-child'
+            ];
+            
+            let minFooterTop = window.innerHeight;
+            
+            footerSelectors.forEach(sel => {
+              try {
+                document.querySelectorAll(sel).forEach(el => {
+                  const rect = el.getBoundingClientRect();
+                  if (rect.top > buttonBottom && rect.top < minFooterTop && rect.height > 0) {
+                    const style = window.getComputedStyle(el);
+                    const bgColor = style.backgroundColor;
+                    const isNearBottom = rect.bottom >= window.innerHeight - 50;
+                    
+                    const isBlueBackground = bgColor.includes('rgb') && (
+                      bgColor.includes('0, 0') ||
+                      bgColor.includes('13, 110') ||
+                      bgColor.includes('29, 78') ||
+                      bgColor.includes('37, 99')
+                    );
+                    
+                    if (isNearBottom || isBlueBackground || sel === 'body > div:last-child') {
+                      minFooterTop = Math.min(minFooterTop, rect.top);
+                    }
+                  }
+                });
+              } catch(e) {}
+            });
+            
+            // Also check last div
+            const allDivs = document.querySelectorAll('body > div');
+            if (allDivs.length > 0) {
+              const lastDiv = allDivs[allDivs.length - 1];
+              const rect = lastDiv.getBoundingClientRect();
+              if (rect.top > buttonBottom && rect.top < minFooterTop) {
+                minFooterTop = rect.top;
+              }
+            }
+            
+            const availableSpace = minFooterTop - buttonBottom - 30;
+            const maxHeight = Math.max(150, Math.min(300, availableSpace));
+            
+            openDropdown.style.setProperty('max-height', maxHeight + 'px', 'important');
+            
+            const optionsContainer = openDropdown.querySelector('.country-code-options-container');
+            if (optionsContainer) {
+              const optionsMaxHeight = Math.max(100, maxHeight - 60);
+              optionsContainer.style.setProperty('max-height', optionsMaxHeight + 'px', 'important');
+            }
+          });
+        }, 50);
+      }
+      
+      window.addEventListener('resize', recalculateOpenDropdowns);
+      window.addEventListener('scroll', recalculateOpenDropdowns, true);
+      window.countryCodeResizeHandlerAdded = true;
     }
   }
   
