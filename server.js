@@ -76,13 +76,24 @@ app.post('/register', async (req, res) => {
       
       console.error('=== MISSING ENVIRONMENT VARIABLES ===');
       console.error('Missing variables:', missingVars.join(', '));
-      console.error('TELEGRAM_BOT_TOKEN:', botToken ? 'SET' : 'MISSING');
-      console.error('ADMIN_CHAT_ID:', chatId ? 'SET' : 'MISSING');
-      console.error('All environment variables:', Object.keys(process.env).filter(k => k.includes('TELEGRAM') || k.includes('ADMIN') || k.includes('CHAT')));
+      console.error('TELEGRAM_BOT_TOKEN:', botToken ? `SET (length: ${botToken.length})` : 'MISSING');
+      console.error('ADMIN_CHAT_ID:', chatId ? `SET (value: ${chatId})` : 'MISSING');
+      
+      // Debug: Show all environment variable keys
+      const allEnvKeys = Object.keys(process.env);
+      const relevantEnvKeys = allEnvKeys.filter(k => 
+        k.includes('TELEGRAM') || 
+        k.includes('ADMIN') || 
+        k.includes('CHAT') || 
+        k.includes('TOKEN')
+      );
+      console.error('Relevant environment variables found:', relevantEnvKeys.length > 0 ? relevantEnvKeys.join(', ') : 'NONE');
+      console.error('Total environment variables available:', allEnvKeys.length);
       
       return res.status(500).json({ 
         error: 'Server configuration error',
-        details: `Missing required environment variables: ${missingVars.join(', ')}. Please configure these in your Coolify deployment settings.`
+        details: `Missing required environment variables: ${missingVars.join(', ')}. Please configure these in your Coolify deployment settings.`,
+        help: 'Go to Coolify > Application Settings > Environment Variables and add TELEGRAM_BOT_TOKEN and ADMIN_CHAT_ID'
       });
     }
     
@@ -118,22 +129,47 @@ const botToken = process.env.TELEGRAM_BOT_TOKEN;
 const chatId = process.env.ADMIN_CHAT_ID;
 
 console.log('=== SERVER STARTUP CHECK ===');
+console.log(`Port: ${PORT}`);
+console.log(`Node environment: ${process.env.NODE_ENV || 'not set'}`);
+
+// Debug: Show all environment variable keys (filtered for security)
+const envKeys = Object.keys(process.env).sort();
+console.log(`Total environment variables: ${envKeys.length}`);
+const relevantKeys = envKeys.filter(k => 
+  k.includes('TELEGRAM') || 
+  k.includes('ADMIN') || 
+  k.includes('CHAT') || 
+  k.includes('TOKEN') ||
+  k.includes('PORT') ||
+  k === 'NODE_ENV'
+);
+if (relevantKeys.length > 0) {
+  console.log('Relevant environment variables found:', relevantKeys.join(', '));
+}
+
 if (!botToken) {
   console.error('⚠️  WARNING: TELEGRAM_BOT_TOKEN environment variable is not set!');
 } else {
-  console.log('✓ TELEGRAM_BOT_TOKEN is set');
+  console.log('✓ TELEGRAM_BOT_TOKEN is set (length:', botToken.length, ')');
 }
 
 if (!chatId) {
   console.error('⚠️  WARNING: ADMIN_CHAT_ID environment variable is not set!');
 } else {
-  console.log('✓ ADMIN_CHAT_ID is set');
+  console.log('✓ ADMIN_CHAT_ID is set:', chatId);
 }
 
 if (!botToken || !chatId) {
   console.error('⚠️  Registration will fail until these environment variables are configured.');
   console.error('   In Coolify: Go to your application settings > Environment Variables');
   console.error('   Add: TELEGRAM_BOT_TOKEN and ADMIN_CHAT_ID');
+  console.error('');
+  console.error('   To set these in Coolify:');
+  console.error('   1. Go to your application in Coolify');
+  console.error('   2. Click on "Environment Variables"');
+  console.error('   3. Add TELEGRAM_BOT_TOKEN with your bot token from @BotFather');
+  console.error('   4. Add ADMIN_CHAT_ID with your Telegram chat ID');
+  console.error('   5. Redeploy the application');
 }
 
 app.listen(PORT, () => {

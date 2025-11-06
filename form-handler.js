@@ -653,7 +653,7 @@
           phone: !!data.phone,
           ao_leader: !!data.ao_leader
         });
-        alert('Please fill in all required fields.');
+        // Validation error - no alert popup
         return;
       }
       
@@ -675,11 +675,11 @@
           window.location.href = '/success.html';
         } else {
           console.error('Registration failed:', result.error);
-          alert('Registration failed: ' + (result.error || 'Unknown error'));
+          // Registration failed - no alert popup, error logged to console
         }
       } catch (error) {
         console.error('Error submitting form:', error);
-        alert('An error occurred while submitting the form. Please try again.');
+        // Error occurred - no alert popup, error logged to console
       }
     });
   }

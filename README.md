@@ -38,9 +38,35 @@ This application provides a registration form that sends registration data to a 
    - If variables are missing, you'll see warnings in the logs
 
 **Troubleshooting Coolify Deployment:**
-- If you see "Server configuration error" when users try to register, check that `TELEGRAM_BOT_TOKEN` and `ADMIN_CHAT_ID` are set in Coolify's environment variables
-- The server logs will show which variables are missing
-- Make sure to restart/redeploy the application after adding environment variables
+
+If you see errors like "Missing required environment variables" in your logs:
+
+1. **Check Environment Variables in Coolify:**
+   - Go to your application in Coolify dashboard
+   - Click on **Environment Variables** (or **Variables** tab)
+   - Verify that both `TELEGRAM_BOT_TOKEN` and `ADMIN_CHAT_ID` are set
+   - Make sure there are no typos in the variable names (case-sensitive)
+   - Ensure values don't have extra spaces or quotes
+
+2. **Common Issues:**
+   - **Variables not set:** The server logs will show "⚠️ WARNING: TELEGRAM_BOT_TOKEN environment variable is not set!"
+   - **After adding variables:** You MUST redeploy/restart the application for changes to take effect
+   - **Variable names:** Must be exactly `TELEGRAM_BOT_TOKEN` and `ADMIN_CHAT_ID` (case-sensitive)
+
+3. **How to Get Your Values:**
+   - **TELEGRAM_BOT_TOKEN:** 
+     - Message @BotFather on Telegram
+     - Use `/newbot` command to create a bot (if you don't have one)
+     - Copy the token provided (looks like: `123456789:ABCdefGHIjklMNOpqrsTUVwxyz`)
+   - **ADMIN_CHAT_ID:**
+     - Message @userinfobot on Telegram to get your chat ID
+     - Or message your bot first, then visit: `https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates`
+     - Look for the "chat" object and find the "id" field (usually a number like `123456789`)
+
+4. **Verify Deployment:**
+   - Check server startup logs in Coolify
+   - You should see: `✓ TELEGRAM_BOT_TOKEN is set` and `✓ ADMIN_CHAT_ID is set`
+   - If you see warnings, the variables are not configured correctly
 
 ### Option 2: Using Docker Compose (Recommended for Local)
 
