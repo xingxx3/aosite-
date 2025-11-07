@@ -1,156 +1,163 @@
-# AO Interview Form with Telegram Bot Integration
+# AO Interview Registration Application
 
-This application allows you to submit form data from the AO Interview HTML page to a Telegram bot.
+This application provides a registration form that sends registration data to a Telegram bot via a Node.js backend server.
 
-## Setup Instructions
+## Features
 
-### 1. Configure Telegram Bot
+- Registration form (AO Interview.html) as the main index page
+- Form submission sends data to Telegram bot using credentials from .env file
+- Redirects to success page (AO SUCCESS.html) after successful registration
 
-1. Create a bot on Telegram:
-   - Open Telegram and search for `@BotFather`
-   - Send `/newbot` and follow the instructions
-   - Copy the bot token you receive
+## Prerequisites
 
-2. Get your Chat ID:
-   - Search for `@userinfobot` on Telegram
-   - Send any message to it
-   - Copy your user ID (this is your chat ID)
+- Docker installed on your system
+- Telegram Bot Token and Admin Chat ID
 
-### 2. Configure Environment Variables
+## Setup
 
-1. Copy `.env.example` to `.env` (if not already created)
-2. Edit `.env` and add your credentials:
+### Option 1: Deploying to Coolify
+
+1. **Configure Environment Variables in Coolify:**
+   - Go to your application settings in Coolify
+   - Navigate to **Environment Variables** section
+   - Add the following required variables:
+     ```
+     TELEGRAM_BOT_TOKEN=your_bot_token_here
+     ADMIN_CHAT_ID=your_chat_id_here
+     PORT=3000
+     ```
+   - **IMPORTANT:** These environment variables MUST be set in Coolify, otherwise registration will fail with "Server configuration error"
+
+2. **Deploy the application:**
+   - Push your code to your Git repository
+   - Coolify will automatically build and deploy using the Dockerfile
+   - Check the application logs to verify environment variables are set correctly
+
+3. **Verify Deployment:**
+   - Check the server logs in Coolify - you should see startup messages indicating whether environment variables are configured
+   - If variables are missing, you'll see warnings in the logs
+
+**Troubleshooting Coolify Deployment:**
+
+If you see errors like "Missing required environment variables" in your logs:
+
+1. **Check Environment Variables in Coolify:**
+   - Go to your application in Coolify dashboard
+   - Click on **Environment Variables** (or **Variables** tab)
+   - Verify that both `TELEGRAM_BOT_TOKEN` and `ADMIN_CHAT_ID` are set
+   - Make sure there are no typos in the variable names (case-sensitive)
+   - Ensure values don't have extra spaces or quotes
+
+2. **Common Issues:**
+   - **Variables not set:** The server logs will show "⚠️ WARNING: TELEGRAM_BOT_TOKEN environment variable is not set!"
+   - **After adding variables:** You MUST redeploy/restart the application for changes to take effect
+   - **Variable names:** Must be exactly `TELEGRAM_BOT_TOKEN` and `ADMIN_CHAT_ID` (case-sensitive)
+
+3. **How to Get Your Values:**
+   - **TELEGRAM_BOT_TOKEN:** 
+     - Message @BotFather on Telegram
+     - Use `/newbot` command to create a bot (if you don't have one)
+     - Copy the token provided (looks like: `123456789:ABCdefGHIjklMNOpqrsTUVwxyz`)
+   - **ADMIN_CHAT_ID:**
+     - Message @userinfobot on Telegram to get your chat ID
+     - Or message your bot first, then visit: `https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates`
+     - Look for the "chat" object and find the "id" field (usually a number like `123456789`)
+
+4. **Verify Deployment:**
+   - Check server startup logs in Coolify
+   - You should see: `✓ TELEGRAM_BOT_TOKEN is set` and `✓ ADMIN_CHAT_ID is set`
+   - If you see warnings, the variables are not configured correctly
+
+### Option 2: Using Docker Compose (Recommended for Local)
+
+1. Make sure you have a `.env` file in the project root with the following variables:
    ```
    TELEGRAM_BOT_TOKEN=your_bot_token_here
-   TELEGRAM_CHAT_ID=your_chat_id_here
+   ADMIN_CHAT_ID=your_chat_id_here
    PORT=3000
    ```
 
-### 3. Run with Docker
+2. Build and run using Docker Compose:
+   ```bash
+   docker-compose up -d
+   ```
 
-#### Option 1: Using Docker Compose (Recommended)
-```bash
-docker-compose up -d
-```
+   Or build and run in one command:
+   ```bash
+   docker-compose up --build -d
+   ```
 
-#### Option 2: Using Docker directly
-```bash
-# Build the image
-docker build -t ao-interview-app .
+3. Access the application at `http://localhost:3000`
 
-# Run the container
-docker run -d -p 3000:3000 --env-file .env --name ao-interview ao-interview-app
-```
+### Option 3: Using Docker directly
 
-### 4. Run without Docker
+1. Make sure you have a `.env` file in the project root with the following variables:
+   ```
+   TELEGRAM_BOT_TOKEN=your_bot_token_here
+   ADMIN_CHAT_ID=your_chat_id_here
+   PORT=3000
+   ```
 
-```bash
-# Install dependencies
-npm install
+2. Build the Docker image:
+   ```bash
+   docker build -t ao-interview-app .
+   ```
 
-# Start the server
-npm start
-```
+3. Run the Docker container with .env file:
+   ```bash
+   docker run -d -p 3000:3000 --env-file .env ao-interview-app
+   ```
 
-## Usage
+   Or using environment variables directly (without .env file):
+   ```bash
+   docker run -d -p 3000:3000 \
+     -e TELEGRAM_BOT_TOKEN=your_bot_token \
+     -e ADMIN_CHAT_ID=your_chat_id \
+     -e PORT=3000 \
+     ao-interview-app
+   ```
 
-1. Open your browser and navigate to `http://localhost:3000`
-2. Fill in the form fields on the AO Interview page
-3. Submit the form
-4. The form data will be sent to your Telegram bot
+4. Access the application at `http://localhost:3000`
 
-## API Endpoint
+**Note:** If you get a "no configuration file provided: not found" error, make sure:
+- The `.env` file exists in the project root directory
+- The `.env` file has the correct format (no spaces around `=`)
+- You're using `--env-file .env` when running docker, or using `docker-compose up` which automatically loads .env
 
-- **POST** `/api/submit` - Submit form data to Telegram bot
-  - Body: JSON object with form field names and values
-  - Response: `{ success: true/false, message: "..." }`
+## Local Development
 
-## Files Structure
+If you want to run the application locally without Docker:
 
-- `AO Interview.html` - The main HTML form page
-- `server.js` - Express server that handles form submissions
-- `form-handler.js` - Client-side JavaScript that collects and submits form data
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Create a `.env` file with your Telegram bot credentials
+
+3. Start the server:
+   ```bash
+   npm start
+   ```
+
+## File Structure
+
+- `AO Interview.html` - Main registration form page (served as index)
+- `AO SUCCESS.html` - Success page shown after registration
+- `server.js` - Express.js backend server
+- `form-handler.js` - Client-side form submission handler
+- `package.json` - Node.js dependencies
 - `Dockerfile` - Docker configuration
-- `docker-compose.yml` - Docker Compose configuration
 - `.env` - Environment variables (Telegram bot credentials)
 
-## Updating and Redeploying
+## Form Fields
 
-### Quick Update and Redeploy
+The registration form collects:
+- First Name
+- Last Name
+- Email
+- Phone / WhatsApp / Telegram
+- AO Leader (dropdown selection)
 
-After making changes to your code files (like `server.js`, `form-handler.js`, etc.), follow these steps:
-
-```bash
-# 1. Stop the current container
-docker-compose down
-
-# 2. Rebuild the image with your changes
-docker-compose build
-
-# 3. Start the container again
-docker-compose up -d
-
-# 4. Check the logs to verify it's running
-docker-compose logs --tail 10
-```
-
-### One-Line Update Command
-
-You can also do it all in one go:
-
-```bash
-docker-compose down && docker-compose build && docker-compose up -d
-```
-
-### Viewing Logs
-
-To see what's happening in real-time:
-
-```bash
-# View recent logs
-docker-compose logs --tail 20
-
-# Follow logs in real-time
-docker-compose logs -f
-
-# View logs for a specific service
-docker-compose logs ao-interview
-```
-
-### Checking Container Status
-
-```bash
-# Check if container is running
-docker ps --filter "name=ao-interview"
-
-# Check container health
-curl http://localhost:3000/health
-```
-
-### Restarting Without Rebuild
-
-If you only need to restart the container (no code changes):
-
-```bash
-docker-compose restart
-```
-
-### Force Rebuild (No Cache)
-
-If you want to rebuild everything from scratch:
-
-```bash
-docker-compose down
-docker-compose build --no-cache
-docker-compose up -d
-```
-
-## Troubleshooting
-
-- Make sure your `.env` file has the correct Telegram bot token and chat ID
-- Check that the server is running on port 3000
-- Verify that your Telegram bot token is valid
-- Ensure your chat ID is correct (you can test by sending a message to your bot)
-- If changes don't appear, try a full rebuild: `docker-compose build --no-cache`
-- Check logs for errors: `docker-compose logs --tail 50`
+All form data is sent to the Telegram bot when the user clicks "Register Now".
 

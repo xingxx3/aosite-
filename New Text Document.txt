@@ -1,10 +1,7 @@
 docker compose build web
 docker compose up -d web
 
-https://www.aointerview.com/webinar/1778979
-This loads a man giving a brif over view.
-https://www.aointerview.com/webinar/1778973
-This loads time counting down.
+
 
 Changes Made:
 Improved error handling (server.js):
@@ -37,66 +34,3 @@ Set the environment variables in Coolify
 Redeploy/restart the application
 Try registering again — it should work now
 The error message will now be more descriptive if variables are still missing, making it easier to diagnose.
-
-'Aaron Benjamin',
-    'Abigail Johnson',
-    'Adrian Martinez',
-    'Aiden Thompson',
-    'Alexandra Davis',
-    'Amanda Wilson',
-    'Andrew Brown',
-    'Angela White',
-    'Anthony Lee',
-    'Ashley Harris',
-    'Benjamin Taylor',
-    'Brandon Moore',
-    'Brittany Jackson',
-    'Caleb Anderson',
-    'Cameron Thomas',
-    'Caroline Garcia',
-    'Christopher Martin',
-    'Daniel Rodriguez',
-    'David Lewis',
-    'Emily Walker',
-    'Emma Hall',
-    'Ethan Young',
-    'Gabriel King',
-    'Grace Wright',
-    'Hannah Lopez',
-    'Isabella Hill',
-    'Jacob Scott',
-    'James Green',
-    'Jessica Adams',
-    'John Baker',
-    'Jonathan Nelson',
-    'Joshua Carter',
-    'Justin Mitchell',
-    'Katherine Perez',
-    'Kevin Roberts',
-    'Laura Turner',
-    'Lauren Phillips',
-    'Madison Campbell',
-    'Matthew Parker',
-    'Michael Evans',
-    'Morgan Edwards',
-    'Nathan Collins',
-    'Nicholas Stewart',
-    'Olivia Sanchez',
-    'Rachel Morris',
-    'Ryan Rogers',
-    'Samantha Reed',
-    'Sarah Cook',
-    'Stephanie Morgan',
-    'Steven Bell',
-    'Taylor Murphy',
-    'Thomas Bailey',
-    'Tyler Rivera',
-    'Victoria Cooper',
-    'William Richardson',
-    'Zachary Cox'
-
-
- New deployment rules
-docker-compose down
-docker-compose build --no-cache
-docker-compose up -d

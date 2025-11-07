@@ -1,7 +1,6 @@
 services:
-  ao-interview:
+  web:
     build: .
-    container_name: ao-interview-app
     ports:
       - "3000:3000"
     env_file:
