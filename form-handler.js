@@ -572,6 +572,78 @@
   // FORM SUBMISSION HANDLER
   // ============================================
   
+  // Helper function to create a unique identifier from user data
+  function createUserIdentifier(email, phone) {
+    return `${email.toLowerCase().trim()}_${phone.trim().replace(/\s+/g, '')}`;
+  }
+  
+  // Helper function to check if user already submitted
+  function isDuplicateSubmission(email, phone) {
+    try {
+      const submittedUsers = JSON.parse(localStorage.getItem('submittedUsers') || '[]');
+      const userIdentifier = createUserIdentifier(email, phone);
+      return submittedUsers.includes(userIdentifier);
+    } catch (error) {
+      console.error('Error checking duplicate:', error);
+      return false;
+    }
+  }
+  
+  // Helper function to store submitted user data
+  function storeSubmittedUser(email, phone) {
+    try {
+      const submittedUsers = JSON.parse(localStorage.getItem('submittedUsers') || '[]');
+      const userIdentifier = createUserIdentifier(email, phone);
+      if (!submittedUsers.includes(userIdentifier)) {
+        submittedUsers.push(userIdentifier);
+        localStorage.setItem('submittedUsers', JSON.stringify(submittedUsers));
+      }
+    } catch (error) {
+      console.error('Error storing submitted user:', error);
+    }
+  }
+  
+  // Helper function to clear form fields
+  function clearFormFields(form) {
+    // Clear text inputs
+    const textInputs = form.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"]');
+    textInputs.forEach(input => {
+      input.value = '';
+    });
+    
+    // Clear AO Leader selection
+    const button = form.querySelector('button[data-slot="trigger"]') || 
+                   form.querySelector('button[aria-haspopup="listbox"]') ||
+                   form.querySelector('button#react-aria-\\:R25icv6jaH2\\:');
+    if (button) {
+      button.dataset.selectedLeader = '';
+    }
+    
+    const valueSpan = form.querySelector('span[data-slot="value"]') ||
+                      form.querySelector('span#react-aria-\\:R25icv6jaH7\\:');
+    if (valueSpan) {
+      valueSpan.textContent = 'Choose one';
+      valueSpan.style.color = '';
+      valueSpan.style.opacity = '';
+      valueSpan.style.fontWeight = '';
+    }
+    
+    const selectEl = form.querySelector('select[name="select"]');
+    if (!selectEl) {
+      const selectElAlt = form.querySelector('[data-testid="hidden-select-container"] select');
+      if (selectElAlt) {
+        selectElAlt.value = '';
+        selectElAlt.innerHTML = '<option value="">Choose one</option>';
+      }
+    } else {
+      selectEl.value = '';
+      selectEl.innerHTML = '<option value="">Choose one</option>';
+    }
+    
+    // Reset form state
+    form.reset();
+  }
+  
   // Form submission handler
   const form = document.querySelector('.reg-form');
   if (form) {
@@ -657,6 +729,13 @@
         return;
       }
       
+      // Check for duplicate submission
+      if (isDuplicateSubmission(data.email, data.phone)) {
+        console.warn('Duplicate submission detected - same email and phone combination already submitted');
+        alert('⚠️ You have already registered!\n\nThis email and phone number combination has already been submitted. If you need to update your information, please contact support.');
+        return;
+      }
+      
       console.log('All fields valid, submitting...');
       
       try {
@@ -668,19 +747,51 @@
           body: JSON.stringify(data)
         });
         
-        const result = await response.json();
+        let result;
+        try {
+          result = await response.json();
+        } catch (jsonError) {
+          // If response is not JSON, create error object
+          result = { 
+            success: false, 
+            error: response.status === 409 
+              ? 'You have already registered! This email and phone number combination has already been registered.'
+              : 'An error occurred while processing your registration.'
+          };
+        }
+        
+        // Check for duplicate error from server (409 Conflict status)
+        if (response.status === 409 || (result.error && result.error.toLowerCase().includes('duplicate')) || (result.error && result.error.toLowerCase().includes('already registered'))) {
+          console.warn('Duplicate submission detected by server:', result.error);
+          alert('⚠️ You have already registered!\n\nThis email and phone number combination has already been registered. If you need to update your information, please contact support.');
+          // Store even failed duplicate to prevent retries
+          storeSubmittedUser(data.email, data.phone);
+          return;
+        }
         
         if (result.success) {
           console.log('Registration successful!');
-          window.location.href = '/success.html';
+          
+          // Store submitted user data to prevent duplicates
+          storeSubmittedUser(data.email, data.phone);
+          
+          // Clear form fields before redirect
+          clearFormFields(form);
+          
+          // Small delay to ensure form is cleared, then redirect
+          setTimeout(() => {
+            window.location.href = '/success.html';
+          }, 100);
         } else {
           console.error('Registration failed:', result.error);
-          // Registration failed - no alert popup, error logged to console
+          alert('Registration failed. Please try again or contact support if the problem persists.');
         }
       } catch (error) {
         console.error('Error submitting form:', error);
-        // Error occurred - no alert popup, error logged to console
+        alert('An error occurred while submitting the form. Please check your connection and try again.');
       }
+
     });
   }
 })();
+

@@ -8,66 +8,7 @@
     'use strict';
     // Wait for DOM to be ready
     function initBackButton() {
-        // Create back button
-        const backButton = document.createElement('button');
-        backButton.textContent = '← Back';
-        backButton.id = 'back-to-registration';
-        backButton.setAttribute('type', 'button');
-        backButton.style.cssText = `
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            padding: 4px 8px;
-            background-color: #0066cc;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 500;
-            cursor: pointer;
-            z-index: 10000;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.2s, transform 0.1s;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            width: auto;
-            min-width: auto;
-            max-width: none;
-            display: inline-block;
-            white-space: nowrap;
-        `;
-        
-        // Hover effect
-        backButton.onmouseenter = function() {
-            this.style.backgroundColor = '#0052a3';
-            this.style.transform = 'scale(1.05)';
-        };
-        backButton.onmouseleave = function() {
-            this.style.backgroundColor = '#0066cc';
-            this.style.transform = 'scale(1)';
-        };
-        
-        // Active effect
-        backButton.onmousedown = function() {
-            this.style.transform = 'scale(0.95)';
-        };
-        backButton.onmouseup = function() {
-            this.style.transform = 'scale(1.05)';
-        };
-        
-        // Click handler - go back to registration page
-        backButton.onclick = function(e) {
-            e.preventDefault();
-            // Go back to the previous page (registration form)
-            if (window.history.length > 1) {
-                window.history.back();
-            } else {
-                // If no history, go to home page
-                window.location.href = '/';
-            }
-        };
-        
-        // Append to body
-        document.body.appendChild(backButton);
+        // Back button removed - no longer creating back button
         
         // ============================================
         // LANGUAGE LINK TRANSLATIONS
@@ -116,14 +57,7 @@
         function applyTranslations(langCode) {
             const lang = translations[langCode] || translations.en;
             
-            // Update back button text
-            if (backButton) {
-                const buttonText = backButton.textContent.trim();
-                const key = getTranslationKey(buttonText);
-                if (key && lang[key]) {
-                    backButton.textContent = lang[key];
-                }
-            }
+            // Back button removed - no longer updating back button text
             
             // Translate headings
             const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
@@ -236,6 +170,143 @@
     // ============================================
     // MOBILE VIEW - MOVE SIDEBAR BACKGROUND TO TOP
     // ============================================
+    
+    // Desktop styles for footer - three column layout
+    const desktopStyle = document.createElement('style');
+    desktopStyle.id = 'ao-desktop-footer-style';
+    desktopStyle.textContent = `
+        /* Desktop view - three column footer layout */
+        @media (min-width: 769px) {
+            /* Style footer to match design - dark blue with curved top */
+            footer,
+            [class*="footer"],
+            body > div:last-child,
+            body > footer {
+                background: #0066cc !important;
+                background-color: #0066cc !important;
+                color: #ffffff !important;
+                padding: 2rem 3rem !important;
+                margin-top: 0 !important;
+                margin-bottom: 0 !important;
+                min-height: auto !important;
+                height: auto !important;
+                max-height: fit-content !important;
+                display: flex !important;
+                flex-direction: row !important;
+                justify-content: space-between !important;
+                align-items: flex-start !important;
+                gap: 3rem !important;
+                clip-path: polygon(0 15%, 100% 5%, 100% 100%, 0% 100%) !important;
+            }
+            
+            /* Footer three-column layout */
+            footer > *,
+            [class*="footer"] > *,
+            body > div:last-child > * {
+                flex: 1 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 0.75rem !important;
+                align-items: flex-start !important;
+                text-align: left !important;
+            }
+            
+            /* Footer left column - Branding */
+            footer > *:first-child,
+            [class*="footer"] > *:first-child,
+            body > div:last-child > *:first-child {
+                gap: 0.5rem !important;
+            }
+            
+            /* Footer headings */
+            footer h1,
+            footer h2,
+            footer h3,
+            footer h4,
+            [class*="footer"] h1,
+            [class*="footer"] h2,
+            [class*="footer"] h3,
+            [class*="footer"] h4,
+            body > div:last-child h1,
+            body > div:last-child h2,
+            body > div:last-child h3,
+            body > div:last-child h4 {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            /* Footer main title */
+            footer h1,
+            footer h2,
+            [class*="footer"] h1,
+            [class*="footer"] h2,
+            body > div:last-child h1,
+            body > div:last-child h2 {
+                color: #ffffff !important;
+                font-size: 1.25rem !important;
+                font-weight: bold !important;
+            }
+            
+            /* Footer section headings (LANGUAGES, LEGAL) */
+            footer h3,
+            footer h4,
+            [class*="footer"] h3,
+            [class*="footer"] h4,
+            body > div:last-child h3,
+            body > div:last-child h4 {
+                color: #cccccc !important;
+                font-size: 0.75rem !important;
+                font-weight: 600 !important;
+                text-transform: uppercase !important;
+                letter-spacing: 0.05em !important;
+                margin-bottom: 0.5rem !important;
+            }
+            
+            /* Footer links and text - all white */
+            footer a,
+            footer p,
+            footer span,
+            [class*="footer"] a,
+            [class*="footer"] p,
+            [class*="footer"] span,
+            body > div:last-child a,
+            body > div:last-child p,
+            body > div:last-child span {
+                color: #ffffff !important;
+                font-size: 0.875rem !important;
+                line-height: 1.5 !important;
+                text-decoration: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                display: block !important;
+            }
+            
+            /* Footer copyright text - light gray */
+            footer p,
+            footer span,
+            [class*="footer"] p:not(h3):not(h4),
+            [class*="footer"] span:not(h3):not(h4),
+            body > div:last-child p:not(h3):not(h4),
+            body > div:last-child span:not(h3):not(h4) {
+                color: #cccccc !important;
+            }
+            
+            /* Footer social icons */
+            footer a[href*="facebook"],
+            footer a[href*="instagram"],
+            footer a[href*="linkedin"],
+            footer svg,
+            [class*="footer"] svg,
+            body > div:last-child svg {
+                color: #ffffff !important;
+                width: 24px !important;
+                height: 24px !important;
+                display: inline-block !important;
+                margin: 0 0.75rem 0 0 !important;
+            }
+        }
+    `;
+    document.head.appendChild(desktopStyle);
     
     // Add CSS for mobile view
     const mobileStyle = document.createElement('style');
@@ -351,12 +422,7 @@
                 font-size: 16px !important; /* Prevents zoom on iOS */
             }
             
-            /* Keep back button small on mobile */
-            #back-to-registration {
-                width: auto !important;
-                min-width: auto !important;
-                max-width: none !important;
-                padding: 4px 8px !important;
+            /* Back button removed - CSS removed */
                 font-size: 11px !important;
                 display: inline-block !important;
             }
@@ -375,8 +441,8 @@
             [class*="footer"],
             div:last-child,
             body > div:last-of-type {
-                padding-top: 0.5rem !important;
-                padding-bottom: 0.5rem !important;
+                padding-top: 0.75rem !important;
+                padding-bottom: 0.75rem !important;
                 min-height: auto !important;
                 height: auto !important;
                 max-height: none !important;
@@ -387,11 +453,11 @@
             div[style*="padding-top"]:last-child,
             div[style*="padding-bottom"]:last-child,
             div[style*="min-height"]:last-child {
-                padding-top: 0.5rem !important;
-                padding-bottom: 0.5rem !important;
+                padding-top: 0.75rem !important;
+                padding-bottom: 0.75rem !important;
                 min-height: auto !important;
                 height: auto !important;
-                max-height: 200px !important;
+                max-height: fit-content !important;
             }
             
             /* Target elements with blue background at bottom */
@@ -399,11 +465,11 @@
             body > footer,
             div:last-child[style*="background"],
             div:last-child[style*="background-color"] {
-                padding: 0.75rem !important;
+                padding: 1rem 0.75rem !important;
                 margin: 0 !important;
                 min-height: auto !important;
                 height: auto !important;
-                max-height: 200px !important;
+                max-height: fit-content !important;
             }
             
             /* Ensure footer content fits and doesn't cause overflow */
@@ -411,8 +477,10 @@
             [class*="footer"] *,
             body > div:last-child *,
             div:last-child * {
-                padding: 0.25rem !important;
+                padding: 0.25rem 0.5rem !important;
                 margin: 0.25rem 0 !important;
+                font-size: 0.875rem !important;
+                line-height: 1.4 !important;
             }
             
             /* Remove any full-screen height on last divs */
@@ -420,18 +488,61 @@
                 min-height: auto !important;
                 height: auto !important;
                 max-height: fit-content !important;
-                padding-top: 0.75rem !important;
-                padding-bottom: 0.75rem !important;
+                padding-top: 1rem !important;
+                padding-bottom: 1rem !important;
             }
             
-            /* Ensure footer only takes space needed for content */
+            /* Ensure footer only takes space needed for content - horizontal layout */
             body > div:last-child,
             footer,
             [class*="footer"] {
                 display: flex !important;
-                flex-direction: column !important;
+                flex-direction: row !important;
                 align-items: center !important;
                 justify-content: center !important;
+                text-align: center !important;
+                flex-wrap: wrap !important;
+                gap: 0.5rem 1rem !important;
+            }
+            
+            /* Fix footer text wrapping and spacing - allow inline display */
+            footer p,
+            footer span,
+            footer div,
+            [class*="footer"] p,
+            [class*="footer"] span,
+            [class*="footer"] div,
+            body > div:last-child p,
+            body > div:last-child span,
+            body > div:last-child div {
+                word-wrap: break-word !important;
+                overflow-wrap: break-word !important;
+                max-width: fit-content !important;
+                width: auto !important;
+                text-align: center !important;
+                padding: 0.25rem 0.5rem !important;
+                display: inline-block !important;
+                white-space: nowrap !important;
+            }
+            
+            /* Fix social media icons spacing on mobile - inline */
+            footer a,
+            [class*="footer"] a,
+            body > div:last-child a {
+                display: inline-block !important;
+                margin: 0 0.5rem !important;
+                padding: 0.25rem !important;
+                white-space: nowrap !important;
+            }
+            
+            /* Ensure footer doesn't overflow horizontally */
+            footer,
+            [class*="footer"],
+            body > div:last-child {
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+                overflow-x: hidden !important;
             }
         }
     `;
@@ -534,8 +645,11 @@
                         lastDiv.style.minHeight = 'auto';
                         lastDiv.style.height = 'auto';
                         lastDiv.style.maxHeight = 'fit-content';
-                        lastDiv.style.paddingTop = '0.75rem';
-                        lastDiv.style.paddingBottom = '0.75rem';
+                        lastDiv.style.paddingTop = '1rem';
+                        lastDiv.style.paddingBottom = '1rem';
+                        lastDiv.style.width = '100%';
+                        lastDiv.style.boxSizing = 'border-box';
+                        lastDiv.style.overflowX = 'hidden';
                     }
                 }
                 
@@ -546,30 +660,98 @@
                         footer.style.minHeight = 'auto';
                         footer.style.height = 'auto';
                         footer.style.maxHeight = 'fit-content';
-                        footer.style.paddingTop = '0.5rem';
-                        footer.style.paddingBottom = '0.5rem';
+                        footer.style.paddingTop = '1rem';
+                        footer.style.paddingBottom = '1rem';
+                        footer.style.width = '100%';
+                        footer.style.boxSizing = 'border-box';
+                        footer.style.overflowX = 'auto';
+                        footer.style.overflowY = 'hidden';
+                        footer.style.display = 'flex';
+                        footer.style.flexDirection = 'row';
+                        footer.style.alignItems = 'center';
+                        footer.style.justifyContent = 'center';
+                        footer.style.textAlign = 'center';
+                        footer.style.gap = '0.5rem 1rem';
+                        footer.style.flexWrap = 'wrap';
+                        
+                        // Fix all child elements - allow inline display
+                        const children = footer.querySelectorAll('*');
+                        children.forEach(child => {
+                            child.style.maxWidth = 'fit-content';
+                            child.style.width = 'auto';
+                            child.style.wordWrap = 'break-word';
+                            child.style.overflowWrap = 'break-word';
+                            child.style.textAlign = 'center';
+                            child.style.display = 'inline-block';
+                            child.style.whiteSpace = 'nowrap';
+                        });
                     }
                 });
             }
             
             fixFooterHeight();
+            
+            // Also run on resize
+            window.addEventListener('resize', () => {
+                setTimeout(fixFooterHeight, 100);
+            });
         }
+    }
+    
+    // Function to style footer
+    function styleFooter() {
+        const footers = document.querySelectorAll('footer, [class*="footer"], body > div:last-child');
+        footers.forEach(footer => {
+            if (window.innerWidth > 768) {
+                // Desktop footer styling - three columns
+                footer.style.background = '#0066cc';
+                footer.style.backgroundColor = '#0066cc';
+                footer.style.color = '#ffffff';
+                footer.style.padding = '2rem 3rem';
+                footer.style.display = 'flex';
+                footer.style.flexDirection = 'row';
+                footer.style.justifyContent = 'space-between';
+                footer.style.alignItems = 'flex-start';
+                footer.style.gap = '3rem';
+                footer.style.clipPath = 'polygon(0 15%, 100% 5%, 100% 100%, 0% 100%)';
+                
+                // Style footer columns
+                const children = Array.from(footer.children);
+                children.forEach((child, index) => {
+                    child.style.flex = '1';
+                    child.style.display = 'flex';
+                    child.style.flexDirection = 'column';
+                    child.style.gap = index === 0 ? '0.5rem' : '0.75rem';
+                    child.style.alignItems = 'flex-start';
+                    child.style.textAlign = 'left';
+                });
+            }
+        });
     }
     
     // Run on page load
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(moveSidebarBgToTop, 100);
+            setTimeout(() => {
+                moveSidebarBgToTop();
+                styleFooter();
+            }, 100);
         });
     } else {
-        setTimeout(moveSidebarBgToTop, 100);
+        setTimeout(() => {
+            moveSidebarBgToTop();
+            styleFooter();
+        }, 100);
     }
     
     // Run on resize
     let resizeTimeout;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(moveSidebarBgToTop, 100);
+        resizeTimeout = setTimeout(() => {
+            moveSidebarBgToTop();
+            styleFooter();
+        }, 100);
     });
     
     // Watch for dynamically added elements

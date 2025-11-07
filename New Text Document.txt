@@ -27,6 +27,7 @@ Check the application logs in Coolify — you should see:
 ✓ TELEGRAM_BOT_TOKEN is set
 ✓ ADMIN_CHAT_ID is set
 If variables are missing, you'll see warnings in the logs.
+
 Next Steps:
 Commit and push these changes to your repository
 Set the environment variables in Coolify
